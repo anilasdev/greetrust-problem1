@@ -1,6 +1,6 @@
 const { askRulers, alliesOfRulers } = require('./questions')
 const Secrets = require('./secrets')
-const Config = require('./config')
+const { Config } = require('./config')
 const readline = require('readline')
 const readInterface = readline.createInterface({
     input: process.stdin,
@@ -13,9 +13,20 @@ let intialized = false
 let isWon = false
 let winCount = 0
 let wonKingdoms = []
+let inputSecretsArray = []
 process.stdin.on('keypress', (str, key) => {
-    if (key.name === 'return' && intialized && !isWon) {
-        readSecrets()
+    if (intialized && !isWon) {
+        if (key.name === 'escape') {
+            inputSecretsArray.forEach((each) => {
+                decodeSecret(each)
+            })
+        }
+        if (key.name === 'return') {
+            readSecrets()
+        }
+    }
+    if (key.name === 'tab') {
+        process.exit()
     }
 });
 
@@ -31,8 +42,8 @@ const init = async () => {
 
 const readSecrets = async () => {
     return new Promise((resolve, reject) => {
-        readInterface.question(``, (answer) => {
-            decodeSecret(answer)
+        readInterface.question(``, (string) => {
+            inputSecretsArray.push(string)
         })
     })
 }

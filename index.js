@@ -24,6 +24,9 @@ process.stdin.on('keypress', (str, key) => {
                 printWinner(wonKingdoms)
                 readInterface.close()
             }
+            else {
+                initialOutput()
+            }
         }
         if (key.name === 'return') {
             readSecrets()
@@ -36,15 +39,17 @@ process.stdin.on('keypress', (str, key) => {
 });
 
 const init = async () => {
-    outputToConsole(askRulers)
-    outputToConsole(Config.no_ruler_text)
-    outputToConsole(alliesOfRulers)
-    outputToConsole(Config.no_ruler_text)
     intialized = true
     outputToConsole(`Input Messages to kingdoms from ${Config.ruler}:`)
     readSecrets()
 }
-
+const initialOutput = () => {
+    outputToConsole(askRulers)
+    outputToConsole(Config.no_ruler_text)
+    outputToConsole(alliesOfRulers)
+    outputToConsole(Config.no_ruler_text)
+    return
+}
 const readSecrets = async () => {
     return new Promise((resolve, reject) => {
         readInterface.question(``, (string) => {

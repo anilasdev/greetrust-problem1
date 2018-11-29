@@ -1,5 +1,6 @@
 const { askRulers, alliesOfRulers } = require('./questions')
 const Secrets = require('./secrets')
+const Config = require('./config')
 const readline = require('readline')
 const readInterface = readline.createInterface({
     input: process.stdin,
@@ -13,46 +14,24 @@ let isWon = false
 let winCount = 0
 let wonKingdoms = []
 process.stdin.on('keypress', (str, key) => {
-    // console.log('str')
-    // console.log(str)
-    //console.log(key)
-    if (key.name === 'return' && intialized) {
-        // if (winCount < 3) {
-        //     readSecrets()
-        // }
-        // else {
-        //     winCount = 0
-        // }
+    if (key.name === 'return' && intialized && !isWon) {
         readSecrets()
     }
 });
 
-const questionInterface = async (question) => {
-    // console.log(question)
-    return new Promise((resolve, reject) => {
-        readInterface.question(`${question}`, (answer) => {
-            if (!isWon) {
-                resolve(`Ouput: None`)
-            }
-            else {
-                decodeSecret(answer)
-            }
-        })
-    })
-}
 const init = async () => {
-    let askRuler = await questionInterface(askRulers)
-    console.log(askRuler)
-    let alliesOfRuler = await questionInterface(alliesOfRulers)
-    console.log(alliesOfRuler)
+    outputToConsole(askRulers)
+    outputToConsole(Config.no_ruler_text)
+    outputToConsole(alliesOfRulers)
+    outputToConsole(Config.no_ruler_text)
     intialized = true
-    //await questionInterface(``)
+    outputToConsole(`Input Messages to kingdoms from ${Config.ruler}:`)
+    readSecrets()
 }
 
 const readSecrets = async () => {
     return new Promise((resolve, reject) => {
         readInterface.question(``, (answer) => {
-            //console.log(answer)
             decodeSecret(answer)
         })
     })
@@ -79,7 +58,6 @@ const verifyCode = (kingdom, secretCode) => {
     return false
 }
 const decodeSecret = async (secret) => {
-    console.log('insde decodeSecret', secret)
     let kingdom
     let secretCode
     let splits = secret.split(',')
@@ -88,25 +66,29 @@ const decodeSecret = async (secret) => {
         splits.shift()
         secretCode = splits.join('')
         if (verifyCode(kingdom, secretCode)) {
-            ++winCount
-            wonKingdoms.push(kingdom)
+            if (!wonKingdoms.includes(kingdom)) {
+                ++winCount
+                wonKingdoms.push(kingdom)
+            }
             if (winCount === 3) {
-                //console.log(wonKingdoms)
-                await printWinner(wonKingdoms)
-                console.log('end')
+                isWon = true
+                printWinner(wonKingdoms)
                 readInterface.close()
             }
         }
     }
 }
-const printWinner = async (wonKingdoms) => {
-    // await questionInterface(askRulers)
-    // console.log('Output: King Shan')
-    await questionInterface(alliesOfRulers)
-    console.log(wonKingdoms.join(', '))
+const printWinner = (wonKingdoms) => {
+    outputToConsole(askRulers)
+    outputToConsole(Config.ruler)
+    outputToConsole(alliesOfRulers)
+    outputToConsole(wonKingdoms.join(', '))
     return
 }
+const outputToConsole = (input) => {
+    console.log(input)
+}
 init()
-//console.log(decodeSecret('Ice, “zmzmzmzaztzozh”'))
+
 
 

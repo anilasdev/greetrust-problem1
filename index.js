@@ -2,12 +2,11 @@ const { askRulers, alliesOfRulers } = require('./questions')
 const Secrets = require('./secrets')
 const { Config } = require('./config')
 const readline = require('readline')
+readline.emitKeypressEvents(process.stdin);
 const readInterface = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 })
-readline.emitKeypressEvents(process.stdin);
-
 
 let intialized = false
 let isWon = false
@@ -20,12 +19,18 @@ process.stdin.on('keypress', (str, key) => {
             inputSecretsArray.forEach((each) => {
                 decodeSecret(each)
             })
+            if (winCount >= Config.noOfWinToRule) {
+                isWon = true
+                printWinner(wonKingdoms)
+                readInterface.close()
+            }
         }
         if (key.name === 'return') {
             readSecrets()
         }
     }
     if (key.name === 'tab') {
+        readInterface.close()
         process.exit()
     }
 });
@@ -80,11 +85,6 @@ const decodeSecret = async (secret) => {
             if (!wonKingdoms.includes(kingdom)) {
                 ++winCount
                 wonKingdoms.push(kingdom)
-            }
-            if (winCount === 3) {
-                isWon = true
-                printWinner(wonKingdoms)
-                readInterface.close()
             }
         }
     }
